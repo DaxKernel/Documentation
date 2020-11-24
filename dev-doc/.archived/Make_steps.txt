@@ -1,0 +1,59 @@
+Installing headers
+--------------------
+
+We have two directories : kernel and libc (See dir.md)
+We use make to install our headers into sysroot/usr/include 
+
+For both directories, make install-headers performs:
+step 1) Create directory sysroot/usr/include if it does not exist
+step 2) Copy everything from include folder to sysroot/usr/include
+
+The actual compilation is done by executing make install on each of the 
+previously mentioned directories:
+This is a little more complicated than installing the headers.
+You must be familiar with the variables used. (see shellscript.md)
+Additionally you also need to be familiar with make. Use the resources 
+in Initial_Resources.md
+
+Make install on /kernel directory
+--------------------
+The make install command further calls two sub commands:
+    1. make install-headers 
+    2. make install-kernel
+
+Sub-command 1 has been described in previous section.
+
+install-kernel requires DaxOS.kernel to proceed -->
+DaxOS.kernel requires OBJS and arch/i386/linker.ld to proceed -->
+    where OBJS is [crti.o crtbegin.o crtend.o ...kernel.o ...]
+the .o files require .c or .S files with same name
+    These are available in the directory :)
+    So compile .c files and .S files  to .o files
+With these .o files, make will produce DaxOS.kernel by linking them
+together
+Then it is confirmed that multiboot is properly working
+
+Now install-kernel proceeds by:
+    step 1: create sysroot/boot directory if it does not exist
+    step 2: copy DaxOS.kernel to sysroot/boot directory
+
+
+Make install on /libc directory
+--------------------
+This will call two sub-commands:
+    1. make install-headers
+    2. make install-libs
+
+Sub-command 1 has been described in previous section.
+
+install-libs require libk.a file as prerequisite. 
+.a files are archive files (like a zip or tar file). In fact you can open .a files to find a collection .c implementation files.
+
+libk.a requires the items in LIBK_OBJS as prerequisite. LIBK_OBJS contains the items in FREEOBJS but with the ending .o replaced
+by .libk.o.
+
+The .libk.o files require .c/.S files as prerequisite. This is available. Therefore the .c/.S files are compiled by GCC to 
+.libk.o files. Now libk.a can be produced by using GNU ar to combine all the .libk.o files into an archive.
+Now install-libs can proceeds by:
+    step 1: create sysroot/usr/lib directory if it does not exist
+    step 2: copy the libk.a file to sysroot/usr/lib directory
